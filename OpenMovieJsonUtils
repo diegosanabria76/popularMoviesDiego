@@ -1,0 +1,85 @@
+package com.maximilianokolbe.diegopopularmovies;
+
+import android.content.ContentValues;
+import android.content.Context;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.HttpURLConnection;
+
+public class OpenMovieJsonUtils {
+
+    public static String[] getSimpleMovieStringsFromJson(Context context, String movieJsonStr)
+        throws JSONException {
+
+        /* Weather information. Each day's forecast info is an element of the "list" array */
+        final String OWM_LIST = "list";
+
+        /* All temperatures are children of the "temp" object */
+        final String OWM_TEMPERATURE = "temp";
+
+        /* Max temperature for the day */
+        final String OWM_MAX = "max";
+        final String OWM_MIN = "min";
+
+        final String OWM_WEATHER = "weather";
+        final String OWM_DESCRIPTION = "main";
+
+        final String OWM_MESSAGE_CODE = "cod";
+
+        /* String array to hold each day's weather String */
+        String[] parsedMovieData = null;
+
+        JSONObject movieJson = new JSONObject(movieJsonStr);
+
+        /* Is there an error? */
+        if (movieJson.has(OWM_MESSAGE_CODE)) {
+            int errorCode = movieJson.getInt(OWM_MESSAGE_CODE);
+
+            switch (errorCode) {
+                case HttpURLConnection.HTTP_OK:
+                    break;
+                case HttpURLConnection.HTTP_NOT_FOUND:
+                    /* Location invalid */
+                    return null;
+                default:
+                    /* Server probably down */
+                    return null;
+            }
+
+        }
+        JSONArray movieArray = movieJson.getJSONArray(OWM_LIST);
+
+        parsedMovieData = new String[movieArray.length()];
+
+        for(int i =0; i<movieArray.length(); i++){
+
+            String tRated;
+            String plot;
+
+            JSONObject topRated = movieArray.getJSONObject(i);
+
+            JSONObject movieObject =
+                    movieJson.getJSONArray(OWM_WEATHER).getJSONObject(0);
+            plot = movieObject.getString(OWM_DESCRIPTION);
+
+            JSONObject popularMovie = topRated.getJSONObject(OWM_TEMPERATURE);
+
+            parsedMovieData[i] = "movie info Test" + plot;
+
+        }
+
+        return parsedMovieData;
+    }
+
+
+    public static ContentValues[] getFullMovieDataFromJson(Context context, String movieJsonStr){
+        return null;
+    }
+
+    }
+
+
+
